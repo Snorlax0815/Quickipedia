@@ -1,0 +1,100 @@
+{
+  "tfa": {
+    "type": "standard",
+    "title": "Munsey's_Magazine",
+    "displaytitle": "<i>Munsey's Magazine<\/i>",
+    "namespace": {
+      "id": 0,
+      "text": ""
+    },
+    "wikibase_item": "Q6936865",
+    "titles": {
+      "canonical": "Munsey's_Magazine",
+      "normalized": "Munsey's Magazine",
+      "display": "<i>Munsey's Magazine<\/i>"
+    },
+    "pageid": 20223117,
+    "thumbnail": {
+      "source": "https:\/\/upload.wikimedia.org\/wikipedia\/commons\/a\/a3\/Munseys_Magazine_May_1911.jpg",
+      "width": 300,
+      "height": 424
+    },
+    "originalimage": {
+      "source": "https:\/\/upload.wikimedia.org\/wikipedia\/commons\/a\/a3\/Munseys_Magazine_May_1911.jpg",
+      "width": 300,
+      "height": 424
+    },
+    "lang": "en",
+    "dir": "ltr",
+    "revision": "1227736069",
+    "tid": "9733d9e6-24da-11ef-9bb9-731ee24f2fc9",
+    "timestamp": "2024-06-07T14:31:13Z",
+    "description": "American magazine (1889–1929)",
+    "description_source": "local",
+    "content_urls": {
+      "desktop": {
+        "page": "https:\/\/en.wikipedia.org\/wiki\/Munsey's_Magazine",
+        "revisions": "https:\/\/en.wikipedia.org\/wiki\/Munsey's_Magazine?action=history",
+        "edit": "https:\/\/en.wikipedia.org\/wiki\/Munsey's_Magazine?action=edit",
+        "talk": "https:\/\/en.wikipedia.org\/wiki\/Talk:Munsey's_Magazine"
+      },
+      "mobile": {
+        "page": "https:\/\/en.m.wikipedia.org\/wiki\/Munsey's_Magazine",
+        "revisions": "https:\/\/en.m.wikipedia.org\/wiki\/Special:History\/Munsey's_Magazine",
+        "edit": "https:\/\/en.m.wikipedia.org\/wiki\/Munsey's_Magazine?action=edit",
+        "talk": "https:\/\/en.m.wikipedia.org\/wiki\/Talk:Munsey's_Magazine"
+      }
+    },
+    "extract": "Munsey's Magazine was an American magazine founded by Frank Munsey in 1889 as Munsey's Weekly, a humor magazine edited by John Kendrick Bangs. It was unsuccessful, and by late 1891 had lost $100,000. Munsey converted it into an illustrated general monthly in October of that year, retitled Munsey's Magazine and priced at twenty-five cents. Richard Titherington became the editor, and remained in that role throughout the magazine's existence. In 1893 Munsey cut the price to ten cents. This brought him into conflict with the American News Company, which had a near-monopoly on magazine distribution, as they were unwilling to handle the magazine at the cost Munsey proposed. Munsey started his own distribution company and was quickly successful: the first ten cent issue began with a print run of 20,000 copies but eventually sold 60,000, and within a year circulation had risen to over a quarter of a million issues.",
+    "extract_html": "<p><i><b>Munsey's Magazine<\/b><\/i> was an American magazine founded by Frank Munsey in 1889 as <i><b>Munsey's Weekly<\/b><\/i>, a humor magazine edited by John Kendrick Bangs. It was unsuccessful, and by late 1891 had lost $100,000. Munsey converted it into an illustrated general monthly in October of that year, retitled <i>Munsey's Magazine<\/i> and priced at twenty-five cents. Richard Titherington became the editor, and remained in that role throughout the magazine's existence. In 1893 Munsey cut the price to ten cents. This brought him into conflict with the American News Company, which had a near-monopoly on magazine distribution, as they were unwilling to handle the magazine at the cost Munsey proposed. Munsey started his own distribution company and was quickly successful: the first ten cent issue began with a print run of 20,000 copies but eventually sold 60,000, and within a year circulation had risen to over a quarter of a million issues.<\/p>",
+    "normalizedtitle": "Munsey's Magazine"
+  },
+  "mostread": {
+    "date": "2024-06-06Z",
+    "articles": [
+      {
+        "views": 494081,
+        "rank": 3,
+        "view_history": [
+          {
+            "date": "2024-06-02Z",
+            "views": 36225
+          },
+          {
+            "date": "2024-06-03Z",
+            "views": 42926
+          },
+          {
+            "date": "2024-06-04Z",
+            "views": 60113
+          },
+          {
+            "date": "2024-06-05Z",
+            "views": 163003
+          },
+          {
+            "date": "2024-06-06Z",
+            "views": 494081
+          }
+        ],
+        "type": "standard",
+        "title": "Normandy_landings",
+        "displaytitle": "<span class=\"mw-page-title-main\">Normandy landings<\/span>",
+        "namespace": {
+          "id": 0,
+          "text": ""
+        },
+        "wikibase_item": "Q16470",
+        "titles": {
+          "canonical": "Normandy_landings",
+          "normalized": "Normandy landings",
+          "display": "<span class=\"mw-page-title-main\">Normandy landings<\/span>"
+        },
+        "pageid": 252854,
+        "thumbnail": {
+          "source": "https:\/\/upload.wikimedia.org\/wikipedia\/commons\/thumb\/a"
+        }
+      }
+    ]
+  }
+}

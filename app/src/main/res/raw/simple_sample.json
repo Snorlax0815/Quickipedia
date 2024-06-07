@@ -1,0 +1,22 @@
+{
+  "tfa": {
+    "thumbnail": {
+      "source": "https:\/\/upload.wikimedia.org\/wikipedia\/commons\/a\/a3\/Munseys_Magazine_May_1911.jpg",
+      "width": 300,
+      "height": 424
+    },
+    "lang": "en",
+    "timestamp": "2024-06-07T14:31:13Z",
+    "description": "American magazine (1889–1929)",
+    "content_urls": {
+      "desktop": {
+        "page": "https:\/\/en.wikipedia.org\/wiki\/Munsey's_Magazine",
+        "revisions": "https:\/\/en.wikipedia.org\/wiki\/Munsey's_Magazine?action=history",
+        "edit": "https:\/\/en.wikipedia.org\/wiki\/Munsey's_Magazine?action=edit",
+        "talk": "https:\/\/en.wikipedia.org\/wiki\/Talk:Munsey's_Magazine"
+      }
+    },
+    "extract": "Munsey's Magazine was an American magazine founded by Frank Munsey in 1889 as Munsey's Weekly, a humor magazine edited by John Kendrick Bangs. It was unsuccessful, and by late 1891 had lost $100,000. Munsey converted it into an illustrated general monthly in October of that year, retitled Munsey's Magazine and priced at twenty-five cents. Richard Titherington became the editor, and remained in that role throughout the magazine's existence. In 1893 Munsey cut the price to ten cents. This brought him into conflict with the American News Company, which had a near-monopoly on magazine distribution, as they were unwilling to handle the magazine at the cost Munsey proposed. Munsey started his own distribution company and was quickly successful: the first ten cent issue began with a print run of 20,000 copies but eventually sold 60,000, and within a year circulation had risen to over a quarter of a million issues.",
+    "normalizedtitle": "Munsey's Magazine"
+  }
+}
