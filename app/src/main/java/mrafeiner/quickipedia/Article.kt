@@ -7,11 +7,18 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -31,12 +38,16 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.size.Size
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -129,24 +140,65 @@ fun Article(modifier: Modifier = Modifier, c: JSONObject = sampleContent) {
                     )
                 ) {
                     Column {
-                        Box(
+                        Row(
                             modifier = Modifier
-                                .heightIn(0.dp, 200.dp)
-                                .fillMaxWidth(0.6f),
-                            contentAlignment = Alignment.TopStart
+                                .fillMaxWidth()
+                                .background(
+                                    brush = Brush.verticalGradient(
+                                        colors = listOf(
+                                            MaterialTheme.colorScheme.onSecondary,
+                                            MaterialTheme.colorScheme.secondaryContainer
+                                        )
+                                    )
+                                )
+                                .padding(16.dp),
+
                         ) {
-                            Card(
-                                shape = RoundedCornerShape(0.dp, 0.dp, 16.dp, 0.dp),
+                            Box(
+                                modifier = Modifier
+                                    .widthIn(0.dp, 200.dp)
+                                    .aspectRatio((content.value.getJSONObject("tfa").getJSONObject("thumbnail").getDouble("width") / content.value.getJSONObject("tfa").getJSONObject("thumbnail").getDouble("height")).toFloat()),
+
+                                contentAlignment = Alignment.TopStart
+                            ) {
+                                Card(
+                                    shape = RoundedCornerShape(0.dp, 0.dp, 16.dp, 0.dp),
+                                    modifier = Modifier.wrapContentSize()
+                                ){
+                                    val painter = rememberAsyncImagePainter(
+                                        model = ImageRequest.Builder(LocalContext.current)
+                                            .data(content.value.getJSONObject("tfa").getJSONObject("thumbnail").getString("source"))
+                                            .size(Size.ORIGINAL)
+                                            .build()
+                                    )
+                                    Image(
+                                        painter = painter,
+                                        contentDescription = "thumbnail",
+                                        contentScale = ContentScale.Fit,
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+                                    /*
+                                    AsyncImage(
+                                        model = content.value.getJSONObject("tfa").getJSONObject("thumbnail").getString("source"),
+                                        contentDescription = "thumbnail",
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
+                                    )*/
+                                }
+                            }
+                            Box(
+                                contentAlignment = Alignment.TopStart,
 
                             ){
-                                AsyncImage(
-                                    model = content.value.getJSONObject("tfa").getJSONObject("thumbnail").getString("source"),
-                                    contentDescription = "thumbnail",
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop
+                                Text(
+                                    text = content.value.getJSONObject("tfa").getString("description"),
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                                    modifier = Modifier.padding(16.dp)
                                 )
                             }
                         }
+
                         Text(
                             text = content.value.getJSONObject("tfa").getString("extract"),
                             color = MaterialTheme.colorScheme.onSecondaryContainer,
