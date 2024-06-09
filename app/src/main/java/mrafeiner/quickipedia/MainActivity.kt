@@ -101,11 +101,12 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.padding(it)
             ){
                 if(displayContent.value){
-                    val pagerState = rememberPagerState(pageCount = {2}, initialPage = 0, initialPageOffsetFraction = 0f)
+                    val pagerState = rememberPagerState(pageCount = {3}, initialPage = 0, initialPageOffsetFraction = 0f)
                     HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
                         when (page) {
                             0 -> Article(c = content)
                             1 -> Image(c = content)
+                            2 -> News(c = content)
                         }
                     }
                 }

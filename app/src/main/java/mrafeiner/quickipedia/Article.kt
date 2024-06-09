@@ -245,21 +245,6 @@ fun Article(modifier: Modifier = Modifier, c: State<JSONObject> = sampleContent)
                                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                                 modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 16.dp)
                             )
-                            Box(
-                                modifier = Modifier
-                                    .background(
-                                        Brush.verticalGradient(
-                                            colors = listOf(
-                                                Color.Transparent,
-                                                MaterialTheme.colorScheme.background,
-                                                Color.Transparent
-                                            ),
-                                            startY = 0f,
-                                            endY = Float.POSITIVE_INFINITY
-                                        )
-                                    )
-                                    .fillMaxSize()
-                            )
                         }
 
 
