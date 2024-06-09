@@ -25,6 +25,7 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -45,7 +46,7 @@ import mrafeiner.quickipedia.ui.theme.Utils
 import org.json.JSONObject
 
 
-val sampleImage: JSONObject = JSONObject("{" +
+val sampleImage: State<JSONObject> = mutableStateOf(JSONObject("{" +
         "\"image\": {\n" +
         "    \"title\": \"File:Katholische Pfarrkirche St. Julitta und Quiricus, Andiast. (actm) 06.jpg\",\n" +
         "    \"thumbnail\": {\n" +
@@ -84,14 +85,14 @@ val sampleImage: JSONObject = JSONObject("{" +
         "      }\n" +
         "    }\n" +
         "  }" +
-        "}")
+        "}"))
 
 
 private val utils: Utils= Utils()
 
 @Composable
-fun Image(modifier: Modifier = Modifier, c: JSONObject = sampleImage){
-    val content = remember { mutableStateOf(sampleImage) }
+fun Image(modifier: Modifier = Modifier, c: State<JSONObject> = sampleImage){
+    val content = c
     val displayContent = remember { mutableStateOf(true) }
     val context = LocalContext.current
     Scaffold(
@@ -110,7 +111,7 @@ fun Image(modifier: Modifier = Modifier, c: JSONObject = sampleImage){
             }*/
         },
         bottomBar = {
-            Box(
+            /*Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
@@ -131,7 +132,7 @@ fun Image(modifier: Modifier = Modifier, c: JSONObject = sampleImage){
                     ) {
                     Text(text ="Send Request")
                 }
-            }
+            }*/
         }
     ) {
         Box(

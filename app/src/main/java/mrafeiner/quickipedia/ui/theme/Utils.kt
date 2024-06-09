@@ -1,5 +1,6 @@
 package mrafeiner.quickipedia.ui.theme
 
+import android.content.Context
 import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -77,5 +78,11 @@ class Utils {
         }
         Log.d(TAG, "sendRequest: $returnObj")
         return returnObj
+    }
+
+    public fun loadDefaults(context: Context) : JSONObject{
+        // load JSON file "sample2.json" and return the file from it
+        val jsonString: String = context.assets.open("sample2.json").bufferedReader().use { it.readText() }
+        return JSONObject(jsonString)
     }
 }

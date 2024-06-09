@@ -35,7 +35,10 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.Recomposer
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -50,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.Lifecycle
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -62,7 +66,7 @@ import org.json.JSONObject
 
 private val utils: Utils = Utils()
 
-private val sampleContent: JSONObject = JSONObject("{\n" +
+private val sampleContent: State<JSONObject> = mutableStateOf(JSONObject("{\n" +
         "  \"tfa\": {\n" +
         "    \"thumbnail\": {\n" +
         "      \"source\": \"https:\\/\\/upload.wikimedia.org\\/wikipedia\\/commons\\/a\\/a3\\/Munseys_Magazine_May_1911.jpg\",\n" +
@@ -83,11 +87,11 @@ private val sampleContent: JSONObject = JSONObject("{\n" +
         "    \"extract\": \"Munsey's Magazine was an American magazine founded by Frank Munsey in 1889 as Munsey's Weekly, a humor magazine edited by John Kendrick Bangs. It was unsuccessful, and by late 1891 had lost \$100,000. Munsey converted it into an illustrated general monthly in October of that year, retitled Munsey's Magazine and priced at twenty-five cents. Richard Titherington became the editor, and remained in that role throughout the magazine's existence. In 1893 Munsey cut the price to ten cents. This brought him into conflict with the American News Company, which had a near-monopoly on magazine distribution, as they were unwilling to handle the magazine at the cost Munsey proposed. Munsey started his own distribution company and was quickly successful: the first ten cent issue began with a print run of 20,000 copies but eventually sold 60,000, and within a year circulation had risen to over a quarter of a million issues.\",\n" +
         "    \"normalizedtitle\": \"Munsey's Magazine\"\n" +
         "  }\n" +
-        "}")
+        "}"))
 
 @Composable
-fun Article(modifier: Modifier = Modifier, c: JSONObject = sampleContent) {
-    val content = remember { mutableStateOf(sampleContent)}
+fun Article(modifier: Modifier = Modifier, c: State<JSONObject> = sampleContent) {
+    val content = c
     val displayContent = remember { mutableStateOf(true) }
     val context = LocalContext.current
     Scaffold(
@@ -106,7 +110,7 @@ fun Article(modifier: Modifier = Modifier, c: JSONObject = sampleContent) {
             }*/
         },
         bottomBar = {
-            Box(
+            /*Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
@@ -127,7 +131,7 @@ fun Article(modifier: Modifier = Modifier, c: JSONObject = sampleContent) {
                     ) {
                     Text(text ="Send Request")
                 }
-            }
+            }*/
         }
     ) {
         Box(
@@ -164,7 +168,15 @@ fun Article(modifier: Modifier = Modifier, c: JSONObject = sampleContent) {
                             Box(
                                 modifier = Modifier
                                     .widthIn(0.dp, 200.dp)
-                                    .aspectRatio((content.value.getJSONObject("tfa").getJSONObject("thumbnail").getDouble("width") / content.value.getJSONObject("tfa").getJSONObject("thumbnail").getDouble("height")).toFloat()),
+                                    .aspectRatio(
+                                        (content.value
+                                            .getJSONObject("tfa")
+                                            .getJSONObject("thumbnail")
+                                            .getDouble("width") / content.value
+                                            .getJSONObject("tfa")
+                                            .getJSONObject("thumbnail")
+                                            .getDouble("height")).toFloat()
+                                    ),
 
                                 contentAlignment = Alignment.TopStart
                             ) {
@@ -205,13 +217,19 @@ fun Article(modifier: Modifier = Modifier, c: JSONObject = sampleContent) {
                                     text = "Open in Wikipedia",
                                     color = MaterialTheme.colorScheme.onSecondaryContainer,
                                     fontSize = MaterialTheme.typography.bodySmall.fontSize,
-                                    modifier = Modifier.padding(8.dp).clickable {
-                                        // Open the Link from the JSON.
-                                        val url = content.value.getJSONObject("tfa").getJSONObject("content_urls").getJSONObject("desktop").getString("page")
-                                        val intent = Intent(Intent.ACTION_VIEW)
-                                        intent.data = Uri.parse(url)
-                                        context.startActivity(intent)
-                                    }
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                        .clickable {
+                                            // Open the Link from the JSON.
+                                            val url = content.value
+                                                .getJSONObject("tfa")
+                                                .getJSONObject("content_urls")
+                                                .getJSONObject("desktop")
+                                                .getString("page")
+                                            val intent = Intent(Intent.ACTION_VIEW)
+                                            intent.data = Uri.parse(url)
+                                            context.startActivity(intent)
+                                        }
                                 )
                             }
                         }
