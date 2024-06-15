@@ -2,6 +2,7 @@ package mrafeiner.quickipedia
 
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.rememberScrollableState
@@ -95,7 +96,8 @@ fun News(modifier: Modifier = Modifier, c: State<JSONObject> = mutableStateOf(ut
         Box(modifier = Modifier.padding(it)){
             // create list of JSONObjects from content, then create NewsArticle for each
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
                     .verticalScroll(rememberScrollState(), true)
                     .heightIn(0.dp, 1000.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -141,42 +143,45 @@ fun NewsArticle(modifier: Modifier = Modifier, article: State<JSONObject>){
                 .padding(16.dp),
 
             ) {
-            Box(
-                modifier = Modifier
-                    .widthIn(0.dp, 150.dp)
-                    .aspectRatio(
-                        (article.value
-                            .getJSONObject("thumbnail")
-                            .getDouble("width") / article.value
-                            .getJSONObject("thumbnail")
-                            .getDouble("height")).toFloat()
-                    ),
+            Log.d("News", "NewsArticle: ${article.value}")
+            if(article.value.has("thumbnail")){
+                Box(
+                    modifier = Modifier
+                        .widthIn(0.dp, 150.dp)
+                        .aspectRatio(
+                            (article.value
+                                .getJSONObject("thumbnail")
+                                .getDouble("width") / article.value
+                                .getJSONObject("thumbnail")
+                                .getDouble("height")).toFloat()
+                        ),
 
-                contentAlignment = Alignment.TopStart
-            ) {
-                Card(
-                    shape = RoundedCornerShape(0.dp, 0.dp, 16.dp, 0.dp),
-                    modifier = Modifier.wrapContentSize()
-                ){
-                    val painter = rememberAsyncImagePainter(
-                        model = ImageRequest.Builder(LocalContext.current)
-                            .data(article.value.getJSONObject("thumbnail").getString("source"))
-                            .size(Size.ORIGINAL)
-                            .build()
-                    )
-                    androidx.compose.foundation.Image(
-                        painter = painter,
-                        contentDescription = "thumbnail",
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                    /*
-                    AsyncImage(
-                        model = content.value.getJSONObject("tfa").getJSONObject("thumbnail").getString("source"),
-                        contentDescription = "thumbnail",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )*/
+                    contentAlignment = Alignment.TopStart
+                ) {
+                    Card(
+                        shape = RoundedCornerShape(0.dp, 0.dp, 16.dp, 0.dp),
+                        modifier = Modifier.wrapContentSize()
+                    ){
+                        val painter = rememberAsyncImagePainter(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(article.value.getJSONObject("thumbnail").getString("source"))
+                                .size(Size.ORIGINAL)
+                                .build()
+                        )
+                        androidx.compose.foundation.Image(
+                            painter = painter,
+                            contentDescription = "thumbnail",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                        /*
+                        AsyncImage(
+                            model = content.value.getJSONObject("tfa").getJSONObject("thumbnail").getString("source"),
+                            contentDescription = "thumbnail",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )*/
+                    }
                 }
             }
             Column(

@@ -45,6 +45,7 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/androidx.compose.material3_material3.version"
         }
     }
 }
@@ -58,11 +59,11 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.glance.material3)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -75,4 +76,13 @@ dependencies {
     implementation(libs.ktor.client.android)
 
     implementation("io.coil-kt:coil-compose:2.6.0")
+
+    // For Glance support
+    implementation("androidx.glance:glance:1.1.0-rc01")
+
+    // For AppWidgets support
+    implementation("androidx.glance:glance-appwidget:1.1.0-rc01")
+    implementation("androidx.compose.material3:material3:1.2.1")
+    implementation("androidx.compose.material3:material3-android:1.2.1")
+
 }
