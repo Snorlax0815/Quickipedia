@@ -2,6 +2,8 @@ package mrafeiner.quickipedia
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +12,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.painter.Painter
@@ -21,6 +25,7 @@ import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.LocalContext
+import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.ImageProvider
 import androidx.glance.appwidget.lazy.LazyColumn
@@ -70,14 +75,26 @@ class Widget : GlanceAppWidget() {
     @Composable
     fun Content() {
         val sampleData: JSONObject = utils.loadDefaults(LocalContext.current)
-        val content = sampleData.getJSONObject("tfa")
-        val imageUrl = content.getJSONObject("thumbnail").getString("source")
+        val content = remember {
+            mutableStateOf<JSONObject>(sampleData.getJSONObject("tfa"))
+        }
+        val imageUrl = content.value.getJSONObject("thumbnail").getString("source")
+        val context = LocalContext.current
+
 
         Column(
             modifier = GlanceModifier
                 .fillMaxSize()
                 .background(GlanceTheme.colors.background)
                 .padding(16.dp)
+                .clickable {
+                    Toast.makeText(context, "Clicked", Toast.LENGTH_SHORT).show()
+                    Log.d("Widget", "Clicked")
+                    // Handle click
+                    CoroutineScope(Dispatchers.IO).launch {
+                        content.value = utils.sendRequest(context = context).getJSONObject("tfa")
+                    }
+                }
         ) {
             Row {
                 /*androidx.glance.Image(
@@ -89,7 +106,7 @@ class Widget : GlanceAppWidget() {
                     modifier = GlanceModifier.fillMaxSize()
                 )*/
                 Text(
-                    text = content.getString("description"),
+                    text = content.value.getString("description"),
                     modifier = GlanceModifier
                         .padding(start = 8.dp),
                     style = TextStyle(
@@ -103,7 +120,7 @@ class Widget : GlanceAppWidget() {
             ){
                 item {
                     Text(
-                        text = content.getString("extract"),
+                        text = content.value.getString("extract"),
                         modifier = GlanceModifier.padding(top = 8.dp),
                         style = TextStyle(
                             color = GlanceTheme.colors.onBackground

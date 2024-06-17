@@ -2,6 +2,7 @@ package mrafeiner.quickipedia.ui.theme
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.ui.platform.LocalContext
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
@@ -30,7 +31,7 @@ class Utils {
      * @param url The URL to send the request to. Default is the featured Article of Wikipedia.
      * @param body The body of the request. Default is an empty JSONObject. Not needed for GET and DELETE.
      */
-    public suspend fun sendRequest(method: String = "GET", url: String = defaultURL, body: JSONObject = JSONObject()): JSONObject{
+    public suspend fun sendRequest(method: String = "GET", url: String = defaultURL, body: JSONObject = JSONObject(), context: Context): JSONObject{
         if (!methods.contains(method))
             Log.e(TAG, "sendRequest: $method is not a valid method. Only $methods are allowed.")
         val returnObj: JSONObject
@@ -77,12 +78,26 @@ class Utils {
             else -> {JSONObject()}
         }
         Log.d(TAG, "sendRequest: $returnObj")
+        Log.d(TAG, "sendRequest: Saving to defaults...")
+        saveDefaults(context = context, body = returnObj)
         return returnObj
     }
 
     public fun loadDefaults(context: Context) : JSONObject{
         // load JSON file "sample2.json" and return the file from it
-        val jsonString: String = context.assets.open("sample2.json").bufferedReader().use { it.readText() }
-        return JSONObject(jsonString)
+        // first check if it exists, if yes, load it, if no, load sample2 from assets.
+        if(context.fileList().contains("defaults.json")){
+            val jsonString: String = context.openFileInput("defaults.json").bufferedReader().use { it.readText() }
+            return JSONObject(jsonString)
+        }
+        // of not, load sample2.json
+        return context.assets.open("sample2.json").bufferedReader().use { it.readText() }.let { JSONObject(it) }
+    }
+
+    public fun saveDefaults(context: Context, body: JSONObject){
+        // save the response body to "defaults.json" in the assets folder. Overwrites the file if it already exists. Save as JSON, not binary.
+        context.openFileOutput("defaults.json", Context.MODE_PRIVATE).use {
+            it.write(body.toString().toByteArray())
+        }
     }
 }

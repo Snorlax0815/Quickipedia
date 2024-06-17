@@ -1,14 +1,17 @@
 package mrafeiner.quickipedia
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -23,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.edit
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +34,10 @@ import kotlinx.coroutines.launch
 import mrafeiner.quickipedia.ui.theme.QuickipediaTheme
 import mrafeiner.quickipedia.ui.theme.Utils
 import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.util.Date
+import java.util.Locale
 
 private val utils: Utils = Utils()
 
@@ -73,27 +81,43 @@ class MainActivity : ComponentActivity() {
                 }*/
             },
             bottomBar = {
-                Box(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
+                        .padding(16.dp)
+                        .wrapContentHeight(),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ){
                     Button(
                         onClick = {
                             // launch Coroutine with dispatchers IO
                             CoroutineScope(Dispatchers.IO).launch {
-                                content.value = utils.sendRequest("GET")
+                                content.value = utils.sendRequest("GET", context = context)
                                 displayContent.value = true
+                                // save last Update in SharedPreferences
+                                val sh = context.getSharedPreferences("lastUpdate", Context.MODE_PRIVATE).edit()
+                                sh.putLong("lastUpdate", System.currentTimeMillis())
+                                sh.commit()
+
                             }
                         },
                         modifier = Modifier
                             .fillMaxWidth(0.75f)
-                            .padding(16.dp),
+                            .padding(0.dp),
 
-                        ) {
+                    ) {
                         Text(text ="Refresh")
                     }
+                    if(context.getSharedPreferences("lastUpdate", Context.MODE_PRIVATE).contains("lastUpdate")){
+                        val d = Date(context.getSharedPreferences("lastUpdate", MODE_PRIVATE).getLong("lastUpdate", 0))
+                        val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+                        val formattedDate = formatter.format(d)
+                        Text(
+                            text = "Last Update: $formattedDate", // Use formattedDate here
+                            modifier = Modifier.padding(top = 0.dp)
+                        )
+                    }
+
                 }
             }
         ){
