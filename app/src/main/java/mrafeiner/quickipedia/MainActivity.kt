@@ -97,6 +97,9 @@ class MainActivity : ComponentActivity() {
                                 // save last Update in SharedPreferences
                                 val sh = context.getSharedPreferences("lastUpdate", Context.MODE_PRIVATE).edit()
                                 sh.putLong("lastUpdate", System.currentTimeMillis())
+                                if(content.value.has("imagePath")){
+                                    sh.putString("imagePath", content.value.getString("imagePath"))
+                                }
                                 sh.commit()
 
                             }

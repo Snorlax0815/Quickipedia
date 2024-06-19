@@ -1,57 +1,54 @@
 package mrafeiner.quickipedia
 
 import android.content.Context
-import android.net.Uri
+import android.graphics.BitmapFactory
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.glance.Button
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
-import androidx.glance.appwidget.ImageProvider
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
-import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
+import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import coil.compose.ImagePainter
-import coil.compose.rememberAsyncImagePainter
+import androidx.lifecycle.LifecycleOwner
+
+import coil.compose.AsyncImage
 import coil.request.ImageRequest
-import coil.size.Size
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import mrafeiner.quickipedia.ui.theme.Utils
 import org.json.JSONObject
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import java.io.File
 
 private val utils = Utils()
 
@@ -97,24 +94,34 @@ class Widget : GlanceAppWidget() {
                 }
         ) {
             Row {
-                /*androidx.glance.Image(
-                    provider = ImageProvider(
-                        uri = Uri.parse(imageUrl)
-                    ),
-                    contentDescription = "thumbnail",
-                    contentScale = androidx.glance.layout.ContentScale.Fit,
-                    modifier = GlanceModifier.fillMaxSize()
-                )*/
+                // check if the image in the internal storage is available, it not, dont draw the image.
+                val sh = context.getSharedPreferences("lastUpdate", Context.MODE_PRIVATE)
+                // if no image is saved, i think we can just skip. Sometimes there is no image with these
+                val path = sh.getString("imagePath", "")
+                Log.d("Widget", "Content: $path")
+                if(path != ""){
+                    val imageFile = File(context.filesDir, path)
+                    val imageBitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+                    val provider = ImageProvider(imageBitmap)
+                    androidx.glance.Image(
+                        provider = provider,
+                        contentDescription = "Image",
+                        modifier = GlanceModifier
+                            .width(200.dp)
+                    )
+                }
                 Text(
                     text = content.value.getString("description"),
                     modifier = GlanceModifier
-                        .padding(start = 8.dp),
+                        .padding(start = 8.dp, top = 8.dp),
                     style = TextStyle(
                         color = GlanceTheme.colors.onBackground,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 20.sp
                     )
                 )
             }
+
             LazyColumn(
 
             ){
@@ -127,6 +134,35 @@ class Widget : GlanceAppWidget() {
                         )
                     )
                 }
+                /*item {
+                    CompositionLocalProvider(
+                        LocalDensity provides Density(context),
+                        LocalLayoutDirection provides LayoutDirection.Ltr,
+                        LocalLifecycleOwner provides LifecycleOwner { context }
+                    ) {
+                        AndroidView(
+                            factory = { context -> // Use the context provided here
+                                ComposeView(context).apply {
+                                    // Provide LocalDensity
+                                    setContent {
+                                        MaterialTheme {
+                                            AsyncImage(
+                                                model = ImageRequest.Builder(context)
+                                                    .data(imageUrl)
+                                                    .build(),
+                                                contentDescription = "My Image Description"
+                                            )
+                                        }
+                                    }
+                                }
+                            },
+                            update = { composeView ->
+                                // Update the ComposeView if needed
+                            }
+                        )
+                    }
+
+                }*/
             }
 
         }

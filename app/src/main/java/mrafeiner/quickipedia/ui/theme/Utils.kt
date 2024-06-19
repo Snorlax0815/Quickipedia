@@ -1,6 +1,7 @@
 package mrafeiner.quickipedia.ui.theme
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.compose.ui.platform.LocalContext
 import io.ktor.client.HttpClient
@@ -10,8 +11,18 @@ import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.headers
+import io.ktor.utils.io.InternalAPI
+import io.ktor.utils.io.copyTo
+import io.ktor.utils.io.streams.asOutput
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.io.File
 import java.time.LocalDate
 
 /**
@@ -77,7 +88,14 @@ class Utils {
             }
             else -> {JSONObject()}
         }
-        Log.d(TAG, "sendRequest: $returnObj")
+        // get imageURL
+        val tfa = returnObj.getJSONObject("tfa")
+        if(tfa.has("thumbnail") || tfa.has("originalimage")){
+            // save the image to the internal storage
+            val imageUrl = if(tfa.has("thumbnail")) tfa.getJSONObject("thumbnail").getString("source") else tfa.getJSONObject("originalimage").getString("source")
+            val path = "defaultImage"+imageUrl.substring(imageUrl.lastIndexOf('.'), imageUrl.length)
+            returnObj.put("imagePath", path)
+        }
         Log.d(TAG, "sendRequest: Saving to defaults...")
         saveDefaults(context = context, body = returnObj)
         return returnObj
@@ -99,5 +117,44 @@ class Utils {
         context.openFileOutput("defaults.json", Context.MODE_PRIVATE).use {
             it.write(body.toString().toByteArray())
         }
+        // download and save the article image needed for the glance widget
+        // https://api.wikimedia.org/wiki/Core_REST_API/Reference/Media_files/Get_file
+        val tfa = body.getJSONObject("tfa")
+        if(tfa.has("thumbnail") || tfa.has("originalimage")){
+            // save the image to the internal storage
+            val imageUrl = if(tfa.has("thumbnail")) tfa.getJSONObject("thumbnail").getString("source") else tfa.getJSONObject("originalimage").getString("source")
+            val path = "defaultImage"+imageUrl.substring(imageUrl.lastIndexOf('.'), imageUrl.length)
+            CoroutineScope(Dispatchers.IO).launch {
+                downloadImage(imageUrl, path, context)
+            }
+        }
+        Log.i(TAG, "saveDefaults: Saved to defaults.json")
+    }
+
+    suspend fun downloadImage(imageUrl: String, imageName: String, context: Context) {
+        val client = HttpClient()
+
+        val httpResponse: HttpResponse = client.get(imageUrl)
+
+        // Get a reference to the app's internal files directory
+        val filesDir = context.filesDir
+
+        val file = File(filesDir, imageName)
+        Log.d(TAG, "downloadImage: ${filesDir.toString() + imageName}")
+
+        withContext(Dispatchers.IO) {
+            // Ensure parent directory exists (not necessary for filesDir)
+            // file.parentFile?.mkdirs()
+
+            // Open output file stream
+            file.outputStream().use { outputStream ->
+                // Receive image data as a byte array
+                val imageBytes = httpResponse.body<ByteArray>()
+
+                // Write to output stream
+                outputStream.write(imageBytes)
+            }
+        }
+
     }
 }
