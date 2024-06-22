@@ -140,7 +140,7 @@ fun Article(modifier: Modifier = Modifier, c: State<JSONObject> = sampleContent)
                 .fillMaxSize(),
             contentAlignment = Alignment.TopCenter
         ) {
-            if(displayContent.value){
+            if(displayContent.value && content.value.has("tfa")){
                 // Text(text = content.value.toString())
                 OutlinedCard (
                     modifier = Modifier.fillMaxWidth(0.95f),
@@ -165,89 +165,96 @@ fun Article(modifier: Modifier = Modifier, c: State<JSONObject> = sampleContent)
                                 .padding(16.dp),
 
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .widthIn(0.dp, 200.dp)
-                                    .aspectRatio(
-                                        (content.value
-                                            .getJSONObject("tfa")
-                                            .getJSONObject("thumbnail")
-                                            .getDouble("width") / content.value
-                                            .getJSONObject("tfa")
-                                            .getJSONObject("thumbnail")
-                                            .getDouble("height")).toFloat()
-                                    ),
+                            if(content.value.getJSONObject("tfa").has("thumbnail")){
+                                Box(
+                                    modifier = Modifier
+                                        .widthIn(0.dp, 200.dp)
+                                        .aspectRatio(
+                                            (content.value
+                                                .getJSONObject("tfa")
+                                                .getJSONObject("thumbnail")
+                                                .getDouble("width") / content.value
+                                                .getJSONObject("tfa")
+                                                .getJSONObject("thumbnail")
+                                                .getDouble("height")).toFloat()
+                                        ),
 
-                                contentAlignment = Alignment.TopStart
-                            ) {
-                                Card(
-                                    shape = RoundedCornerShape(0.dp, 0.dp, 16.dp, 0.dp),
-                                    modifier = Modifier.wrapContentSize()
-                                ){
-                                    val painter = rememberAsyncImagePainter(
-                                        model = ImageRequest.Builder(LocalContext.current)
-                                            .data(content.value.getJSONObject("tfa").getJSONObject("thumbnail").getString("source"))
-                                            .size(Size.ORIGINAL)
-                                            .build()
-                                    )
-                                    Image(
-                                        painter = painter,
-                                        contentDescription = "thumbnail",
-                                        contentScale = ContentScale.Fit,
-                                        modifier = Modifier.fillMaxSize()
-                                    )
-                                    /*
-                                    AsyncImage(
-                                        model = content.value.getJSONObject("tfa").getJSONObject("thumbnail").getString("source"),
-                                        contentDescription = "thumbnail",
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentScale = ContentScale.Crop
-                                    )*/
+                                    contentAlignment = Alignment.TopStart
+                                ) {
+                                    Card(
+                                        shape = RoundedCornerShape(0.dp, 0.dp, 16.dp, 0.dp),
+                                        modifier = Modifier.wrapContentSize()
+                                    ){
+                                        val painter = rememberAsyncImagePainter(
+                                            model = ImageRequest.Builder(LocalContext.current)
+                                                .data(content.value.getJSONObject("tfa").getJSONObject("thumbnail").getString("source"))
+                                                .size(Size.ORIGINAL)
+                                                .build()
+                                        )
+                                        Image(
+                                            painter = painter,
+                                            contentDescription = "thumbnail",
+                                            contentScale = ContentScale.Fit,
+                                            modifier = Modifier.fillMaxSize()
+                                        )
+                                        /*
+                                        AsyncImage(
+                                            model = content.value.getJSONObject("tfa").getJSONObject("thumbnail").getString("source"),
+                                            contentDescription = "thumbnail",
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentScale = ContentScale.Crop
+                                        )*/
+                                    }
                                 }
                             }
                             Column(
                             ){
+                                if(content.value.getJSONObject("tfa").has("description")){
+                                    Text(
+                                        text = content.value.getJSONObject("tfa").getString("description"),
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                                        modifier = Modifier.padding(start = 8.dp, top = 16.dp, end = 0.dp, bottom =0.dp)
+                                    )
+                                }
+                                if(content.value.getJSONObject("tfa").has("content_urls")){
+                                    Text(
+                                        text = "Open in Wikipedia",
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                        fontSize = MaterialTheme.typography.bodySmall.fontSize,
+                                        modifier = Modifier
+                                            .padding(8.dp)
+                                            .clickable {
+                                                // Open the Link from the JSON.
+                                                val url = content.value
+                                                    .getJSONObject("tfa")
+                                                    .getJSONObject("content_urls")
+                                                    .getJSONObject("desktop")
+                                                    .getString("page")
+                                                val intent = Intent(Intent.ACTION_VIEW)
+                                                intent.data = Uri.parse(url)
+                                                context.startActivity(intent)
+                                            }
+                                    )
+                                }
+
+                            }
+                        }
+                        if(content.value.getJSONObject("tfa").has("extract")){
+                            Column(
+                                // make this column scrollable
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(0.dp, 500.dp)
+                                    .verticalScroll(rememberScrollState(), true)
+                            ){
                                 Text(
-                                    text = content.value.getJSONObject("tfa").getString("description"),
+                                    text = content.value.getJSONObject("tfa").getString("extract"),
                                     color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                    fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                                    modifier = Modifier.padding(start = 8.dp, top = 16.dp, end = 0.dp, bottom =0.dp)
-                                )
-                                Text(
-                                    text = "Open in Wikipedia",
-                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                    fontSize = MaterialTheme.typography.bodySmall.fontSize,
-                                    modifier = Modifier
-                                        .padding(8.dp)
-                                        .clickable {
-                                            // Open the Link from the JSON.
-                                            val url = content.value
-                                                .getJSONObject("tfa")
-                                                .getJSONObject("content_urls")
-                                                .getJSONObject("desktop")
-                                                .getString("page")
-                                            val intent = Intent(Intent.ACTION_VIEW)
-                                            intent.data = Uri.parse(url)
-                                            context.startActivity(intent)
-                                        }
+                                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 16.dp)
                                 )
                             }
                         }
-                        Column(
-                            // make this column scrollable
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .heightIn(0.dp, 500.dp)
-                                .verticalScroll(rememberScrollState(), true)
-                        ){
-                            Text(
-                                text = content.value.getJSONObject("tfa").getString("extract"),
-                                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 16.dp)
-                            )
-                        }
-
-
                     }
                 }
 

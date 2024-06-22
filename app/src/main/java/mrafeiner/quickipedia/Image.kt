@@ -141,7 +141,7 @@ fun Image(modifier: Modifier = Modifier, c: State<JSONObject> = sampleImage){
                 .fillMaxSize(),
             contentAlignment = Alignment.TopCenter
         ) {
-            if(displayContent.value){
+            if(displayContent.value && (content.value.has("image"))){
                 // Text(text = content.value.toString())
                 OutlinedCard (
                     modifier = Modifier.fillMaxWidth(0.95f),
@@ -166,87 +166,102 @@ fun Image(modifier: Modifier = Modifier, c: State<JSONObject> = sampleImage){
                                 .padding(16.dp),
 
                             ) {
-                            Box(
-                                modifier = Modifier
-                                    .widthIn(0.dp, 200.dp)
-                                    .aspectRatio((content.value.getJSONObject("image").getJSONObject("thumbnail").getDouble("width") / content.value.getJSONObject("image").getJSONObject("thumbnail").getDouble("height")).toFloat()),
+                            if(content.value.getJSONObject("image").has("thumbnail")){
+                                Box(
+                                    modifier = Modifier
+                                        .widthIn(0.dp, 200.dp)
+                                        .aspectRatio(
+                                            (
+                                                content.value.getJSONObject("image")
+                                                .getJSONObject("thumbnail")
+                                                .getDouble("width") /
+                                                content.value.getJSONObject("image").
+                                                getJSONObject("thumbnail").
+                                                getDouble("height")
+                                            ).toFloat()
+                                        ),
 
-                                contentAlignment = Alignment.TopStart
-                            ) {
-                                Card(
-                                    shape = RoundedCornerShape(0.dp, 0.dp, 16.dp, 0.dp),
-                                    modifier = Modifier.wrapContentSize()
-                                ){
-                                    val painter = rememberAsyncImagePainter(
-                                        model = ImageRequest.Builder(LocalContext.current)
-                                            .data(content.value.getJSONObject("image").getJSONObject("thumbnail").getString("source"))
-                                            .size(Size.ORIGINAL)
-                                            .build()
-                                    )
-                                    androidx.compose.foundation.Image(
-                                        painter = painter,
-                                        contentDescription = "thumbnail",
-                                        contentScale = ContentScale.Fit,
-                                        modifier = Modifier.fillMaxSize()
-                                    )
-                                    /*
-                                    AsyncImage(
-                                        model = content.value.getJSONObject("tfa").getJSONObject("thumbnail").getString("source"),
-                                        contentDescription = "thumbnail",
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentScale = ContentScale.Crop
-                                    )*/
+                                    contentAlignment = Alignment.TopStart
+                                ) {
+                                    Card(
+                                        shape = RoundedCornerShape(0.dp, 0.dp, 16.dp, 0.dp),
+                                        modifier = Modifier.wrapContentSize()
+                                    ){
+                                        val painter = rememberAsyncImagePainter(
+                                            model = ImageRequest.Builder(LocalContext.current)
+                                                .data(content.value.getJSONObject("image").getJSONObject("thumbnail").getString("source"))
+                                                .size(Size.ORIGINAL)
+                                                .build()
+                                        )
+                                        androidx.compose.foundation.Image(
+                                            painter = painter,
+                                            contentDescription = "thumbnail",
+                                            contentScale = ContentScale.Fit,
+                                            modifier = Modifier.fillMaxSize()
+                                        )
+                                        /*
+                                        AsyncImage(
+                                            model = content.value.getJSONObject("tfa").getJSONObject("thumbnail").getString("source"),
+                                            contentDescription = "thumbnail",
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentScale = ContentScale.Crop
+                                        )*/
+                                    }
                                 }
                             }
-                            Column(
-                            ){
-                                Text(
-                                    text = content.value.getJSONObject("image").getString("title").removePrefix("File:").substringBeforeLast("."),
-                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                    fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                                    modifier = Modifier.padding(start = 8.dp, top = 16.dp, end = 0.dp, bottom =0.dp)
-                                )
-                                Text(
-                                    text = "Open in Wikipedia",
-                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                    fontSize = MaterialTheme.typography.bodySmall.fontSize,
-                                    modifier = Modifier.padding(8.dp).clickable {
-                                        // Open the Link from the JSON.
-                                        val url = content.value.getJSONObject("image").getString("file_page")
-                                        val intent = Intent(Intent.ACTION_VIEW)
-                                        intent.data = Uri.parse(url)
-                                        context.startActivity(intent)
-                                    }
-                                )
+                            if(content.value.getJSONObject("image").has("title")){
+                                Column(
+                                ){
+                                    Text(
+                                        text = content.value.getJSONObject("image").getString("title").removePrefix("File:").substringBeforeLast("."),
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                                        modifier = Modifier.padding(start = 8.dp, top = 16.dp, end = 0.dp, bottom =0.dp)
+                                    )
+                                    Text(
+                                        text = "Open in Wikipedia",
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                        fontSize = MaterialTheme.typography.bodySmall.fontSize,
+                                        modifier = Modifier.padding(8.dp).clickable {
+                                            // Open the Link from the JSON.
+                                            val url = content.value.getJSONObject("image").getString("file_page")
+                                            val intent = Intent(Intent.ACTION_VIEW)
+                                            intent.data = Uri.parse(url)
+                                            context.startActivity(intent)
+                                        }
+                                    )
+                                }
                             }
                         }
-                        Column(
-                            // make this column scrollable
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .heightIn(0.dp, 500.dp)
-                                .verticalScroll(rememberScrollState(), true)
-                        ){
-                            Text(
-                                text = content.value.getJSONObject("image").getJSONObject("description").getString("text"),
-                                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 16.dp)
-                            )
-                            Box(
+                        if(content.value.getJSONObject("image").has("description")){
+                            Column(
+                                // make this column scrollable
                                 modifier = Modifier
-                                    .background(
-                                        Brush.verticalGradient(
-                                            colors = listOf(
-                                                Color.Transparent,
-                                                MaterialTheme.colorScheme.background,
-                                                Color.Transparent
-                                            ),
-                                            startY = 0f,
-                                            endY = Float.POSITIVE_INFINITY
+                                    .fillMaxWidth()
+                                    .heightIn(0.dp, 500.dp)
+                                    .verticalScroll(rememberScrollState(), true)
+                            ){
+                                Text(
+                                    text = content.value.getJSONObject("image").getJSONObject("description").getString("text"),
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 16.dp)
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .background(
+                                            Brush.verticalGradient(
+                                                colors = listOf(
+                                                    Color.Transparent,
+                                                    MaterialTheme.colorScheme.background,
+                                                    Color.Transparent
+                                                ),
+                                                startY = 0f,
+                                                endY = Float.POSITIVE_INFINITY
+                                            )
                                         )
-                                    )
-                                    .fillMaxSize()
-                            )
+                                        .fillMaxSize()
+                                )
+                            }
                         }
 
 

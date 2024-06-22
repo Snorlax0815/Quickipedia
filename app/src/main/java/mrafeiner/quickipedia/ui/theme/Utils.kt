@@ -21,6 +21,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONException
 import org.json.JSONObject
 import java.io.File
 import java.time.LocalDate
@@ -105,8 +106,15 @@ class Utils {
         // load JSON file "sample2.json" and return the file from it
         // first check if it exists, if yes, load it, if no, load sample2 from assets.
         if(context.fileList().contains("defaults.json")){
-            val jsonString: String = context.openFileInput("defaults.json").bufferedReader().use { it.readText() }
-            return JSONObject(jsonString)
+            try{
+                val jsonString: String = context.openFileInput("defaults.json").bufferedReader().use { it.readText() }
+                return JSONObject(jsonString)
+            }catch (e: JSONException){
+                Log.e(TAG, "loadDefaults: A JSON Exception has occurred while attempting to load the saved defaults. Fallback samples will load.")
+                val jsonString: String = context.assets.open("sample2.json").bufferedReader().use { it.readText() }
+                return JSONObject(jsonString)
+            }
+
         }
         // of not, load sample2.json
         return context.assets.open("sample2.json").bufferedReader().use { it.readText() }.let { JSONObject(it) }
