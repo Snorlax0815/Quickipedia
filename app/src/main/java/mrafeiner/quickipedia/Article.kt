@@ -209,9 +209,9 @@ fun Article(modifier: Modifier = Modifier, c: State<JSONObject> = sampleContent)
                             }
                             Column(
                             ){
-                                if(content.value.getJSONObject("tfa").has("description")){
+                                if(content.value.getJSONObject("tfa").has("title")){
                                     Text(
-                                        text = content.value.getJSONObject("tfa").getString("description"),
+                                        text = content.value.getJSONObject("tfa").getString("title"),
                                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                                         fontSize = MaterialTheme.typography.titleLarge.fontSize,
                                         modifier = Modifier.padding(start = 8.dp, top = 16.dp, end = 0.dp, bottom =0.dp)

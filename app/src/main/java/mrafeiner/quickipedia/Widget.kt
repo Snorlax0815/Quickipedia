@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.asImageBitmap
@@ -72,10 +73,16 @@ class Widget : GlanceAppWidget() {
     @Composable
     fun Content() {
         val sampleData: JSONObject = utils.loadDefaults(LocalContext.current)
-        val content = remember {
-            mutableStateOf<JSONObject>(sampleData.getJSONObject("tfa"))
+        val content: MutableState<JSONObject> = if(sampleData.has("tfa")){
+            remember {
+                mutableStateOf<JSONObject>(sampleData.getJSONObject("tfa"))
+            }
+        } else{
+            remember {
+                mutableStateOf<JSONObject>(sampleData)
+            }
         }
-        val imageUrl = content.value.getJSONObject("thumbnail").getString("source")
+        // val imageUrl = content.value.getJSONObject("thumbnail").getString("source")
         val context = LocalContext.current
 
 
@@ -110,59 +117,34 @@ class Widget : GlanceAppWidget() {
                             .width(200.dp)
                     )
                 }
-                Text(
-                    text = content.value.getString("description"),
-                    modifier = GlanceModifier
-                        .padding(start = 8.dp, top = 8.dp),
-                    style = TextStyle(
-                        color = GlanceTheme.colors.onBackground,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 20.sp
-                    )
-                )
-            }
-
-            LazyColumn(
-
-            ){
-                item {
+                if(content.value.has("thumbnail")){
                     Text(
-                        text = content.value.getString("extract"),
-                        modifier = GlanceModifier.padding(top = 8.dp),
+                        text = content.value.getString("title"),
+                        modifier = GlanceModifier
+                            .padding(start = 8.dp, top = 8.dp),
                         style = TextStyle(
-                            color = GlanceTheme.colors.onBackground
+                            color = GlanceTheme.colors.onBackground,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp
                         )
                     )
                 }
-                /*item {
-                    CompositionLocalProvider(
-                        LocalDensity provides Density(context),
-                        LocalLayoutDirection provides LayoutDirection.Ltr,
-                        LocalLifecycleOwner provides LifecycleOwner { context }
-                    ) {
-                        AndroidView(
-                            factory = { context -> // Use the context provided here
-                                ComposeView(context).apply {
-                                    // Provide LocalDensity
-                                    setContent {
-                                        MaterialTheme {
-                                            AsyncImage(
-                                                model = ImageRequest.Builder(context)
-                                                    .data(imageUrl)
-                                                    .build(),
-                                                contentDescription = "My Image Description"
-                                            )
-                                        }
-                                    }
-                                }
-                            },
-                            update = { composeView ->
-                                // Update the ComposeView if needed
-                            }
+            }
+
+            if (content.value.has("extract")){
+                LazyColumn(
+
+                ){
+                    item {
+                        Text(
+                            text = content.value.getString("extract"),
+                            modifier = GlanceModifier.padding(top = 8.dp),
+                            style = TextStyle(
+                                color = GlanceTheme.colors.onBackground
+                            )
                         )
                     }
-
-                }*/
+                }
             }
 
         }

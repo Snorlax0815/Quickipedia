@@ -188,9 +188,9 @@ fun NewsArticle(modifier: Modifier = Modifier, article: State<JSONObject>){
             }
             Column(
             ){
-                if(article.value.has("description")){
+                if(article.value.has("title")){
                     Text(
-                        text = article.value.getString("description"),
+                        text = article.value.getString("title"),
                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                         fontSize = MaterialTheme.typography.titleLarge.fontSize,
                         modifier = Modifier.padding(start = 8.dp, top = 16.dp, end = 0.dp, bottom =0.dp)
