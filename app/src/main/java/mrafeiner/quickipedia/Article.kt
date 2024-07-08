@@ -209,9 +209,9 @@ fun Article(modifier: Modifier = Modifier, c: State<JSONObject> = sampleContent)
                             }
                             Column(
                             ){
-                                if(content.value.getJSONObject("tfa").has("title")){
+                                if(content.value.getJSONObject("tfa").has("titles")){
                                     Text(
-                                        text = content.value.getJSONObject("tfa").getString("title"),
+                                        text = content.value.getJSONObject("tfa").getJSONObject("titles").getString("normalized"),
                                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                                         fontSize = MaterialTheme.typography.titleLarge.fontSize,
                                         modifier = Modifier.padding(start = 8.dp, top = 16.dp, end = 0.dp, bottom =0.dp)
@@ -265,7 +265,7 @@ fun Article(modifier: Modifier = Modifier, c: State<JSONObject> = sampleContent)
                     contentAlignment = Alignment.Center
                 ){
                     Text(
-                        text = "Press the button to load content",
+                        text = "Press the button to load content\nIf nothing happens, just relax and try again later.",
                     )
                 }
 

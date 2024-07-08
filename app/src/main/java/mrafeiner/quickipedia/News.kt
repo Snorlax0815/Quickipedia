@@ -113,6 +113,16 @@ fun News(modifier: Modifier = Modifier, c: State<JSONObject> = mutableStateOf(ut
                     }
                 }
             }
+            else{
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ){
+                    Text(
+                        text = "Press the button to load content\nIf nothing happens, just relax and try again later.",
+                    )
+                }
+            }
         }
     }
 }
@@ -188,9 +198,9 @@ fun NewsArticle(modifier: Modifier = Modifier, article: State<JSONObject>){
             }
             Column(
             ){
-                if(article.value.has("title")){
+                if(article.value.has("titles")){
                     Text(
-                        text = article.value.getString("title"),
+                        text = article.value.getJSONObject("titles").getString("normalized"),
                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                         fontSize = MaterialTheme.typography.titleLarge.fontSize,
                         modifier = Modifier.padding(start = 8.dp, top = 16.dp, end = 0.dp, bottom =0.dp)

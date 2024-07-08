@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -72,7 +73,8 @@ class Widget : GlanceAppWidget() {
 
     @Composable
     fun Content() {
-        val sampleData: JSONObject = utils.loadDefaults(LocalContext.current)
+        val context = LocalContext.current
+        val sampleData: JSONObject = utils.loadDefaults(context)
         val content: MutableState<JSONObject> = if(sampleData.has("tfa")){
             remember {
                 mutableStateOf<JSONObject>(sampleData.getJSONObject("tfa"))
@@ -82,8 +84,9 @@ class Widget : GlanceAppWidget() {
                 mutableStateOf<JSONObject>(sampleData)
             }
         }
-        // val imageUrl = content.value.getJSONObject("thumbnail").getString("source")
-        val context = LocalContext.current
+        val imagePath = remember { mutableStateOf("") }
+        imagePath.value = context.getSharedPreferences("lastUpdate", Context.MODE_PRIVATE).getString("imagePath", "").toString()
+
 
 
         Column(
@@ -96,20 +99,26 @@ class Widget : GlanceAppWidget() {
                     Log.d("Widget", "Clicked")
                     // Handle click
                     CoroutineScope(Dispatchers.IO).launch {
-                        content.value = utils.sendRequest(context = context).getJSONObject("tfa")
+                        content.value = utils.sendRequest(context = context)
+                        val sh = context.getSharedPreferences("lastUpdate", Context.MODE_PRIVATE).edit()
+                        sh.putLong("lastUpdate", System.currentTimeMillis())
+                        // only
+                        if(content.value.has("imagePath") && content.value.getJSONObject("tfa").has("thumbnail")){
+                            Log.d("", "path: ${content.value.getString("imagePath")}")
+                            sh.putString("imagePath", content.value.getString("imagePath"))
+                        }
+                        content.value = content.value.getJSONObject("tfa")
+                        sh.apply()
+                        sh.commit()
                     }
                 }
         ) {
             Row {
-                // check if the image in the internal storage is available, it not, dont draw the image.
-                val sh = context.getSharedPreferences("lastUpdate", Context.MODE_PRIVATE)
-                // if no image is saved, i think we can just skip. Sometimes there is no image with these
-                val path = sh.getString("imagePath", "")
-                Log.d("Widget", "Content: $path")
-                if(path != ""){
-                    val imageFile = File(context.filesDir, path)
+                if (content.value.has("thumbnail")) {
+                    val imageFile = File(context.filesDir, imagePath.value)
                     val imageBitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
                     val provider = ImageProvider(imageBitmap)
+
                     androidx.glance.Image(
                         provider = provider,
                         contentDescription = "Image",
@@ -117,9 +126,9 @@ class Widget : GlanceAppWidget() {
                             .width(200.dp)
                     )
                 }
-                if(content.value.has("thumbnail")){
+                if(content.value.has("titles")){
                     Text(
-                        text = content.value.getString("title"),
+                        text = content.value.getJSONObject("titles").getString("normalized"),
                         modifier = GlanceModifier
                             .padding(start = 8.dp, top = 8.dp),
                         style = TextStyle(

@@ -275,7 +275,8 @@ fun Image(modifier: Modifier = Modifier, c: State<JSONObject> = sampleImage){
                     contentAlignment = Alignment.Center
                 ){
                     Text(
-                        text = "Press the button to load content",
+                        text = "Press the button to load content\n" +
+                                "If nothing happens, just relax and try again later.",
                     )
                 }
 

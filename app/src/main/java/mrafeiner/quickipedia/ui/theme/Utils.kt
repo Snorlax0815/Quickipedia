@@ -90,12 +90,14 @@ class Utils {
             else -> {JSONObject()}
         }
         // get imageURL
-        val tfa = returnObj.getJSONObject("tfa")
-        if(tfa.has("thumbnail") || tfa.has("originalimage")){
-            // save the image to the internal storage
-            val imageUrl = if(tfa.has("thumbnail")) tfa.getJSONObject("thumbnail").getString("source") else tfa.getJSONObject("originalimage").getString("source")
-            val path = "defaultImage"+imageUrl.substring(imageUrl.lastIndexOf('.'), imageUrl.length)
-            returnObj.put("imagePath", path)
+        if (returnObj.has("tfa")){
+            val tfa = returnObj.getJSONObject("tfa")
+            if(tfa.has("thumbnail") || tfa.has("originalimage")){
+                // save the image to the internal storage
+                val imageUrl = if(tfa.has("thumbnail")) tfa.getJSONObject("thumbnail").getString("source") else tfa.getJSONObject("originalimage").getString("source")
+                val path = "defaultImage"+imageUrl.substring(imageUrl.lastIndexOf('.'), imageUrl.length)
+                returnObj.put("imagePath", path)
+            }
         }
         Log.d(TAG, "sendRequest: Saving to defaults...")
         saveDefaults(context = context, body = returnObj)
@@ -127,15 +129,29 @@ class Utils {
         }
         // download and save the article image needed for the glance widget
         // https://api.wikimedia.org/wiki/Core_REST_API/Reference/Media_files/Get_file
-        val tfa = body.getJSONObject("tfa")
-        if(tfa.has("thumbnail") || tfa.has("originalimage")){
-            // save the image to the internal storage
-            val imageUrl = if(tfa.has("thumbnail")) tfa.getJSONObject("thumbnail").getString("source") else tfa.getJSONObject("originalimage").getString("source")
-            val path = "defaultImage"+imageUrl.substring(imageUrl.lastIndexOf('.'), imageUrl.length)
-            CoroutineScope(Dispatchers.IO).launch {
-                downloadImage(imageUrl, path, context)
+        if(body.has("tfa")){
+            val tfa = body.getJSONObject("tfa")
+            if(tfa.has("thumbnail") || tfa.has("originalimage")){
+                // save the image to the internal storage
+                val imageUrl = if(tfa.has("thumbnail")) tfa.getJSONObject("thumbnail").getString("source") else tfa.getJSONObject("originalimage").getString("source")
+                val path = "defaultImage"+imageUrl.substring(imageUrl.lastIndexOf('.'), imageUrl.length)
+                CoroutineScope(Dispatchers.IO).launch {
+                    downloadImage(imageUrl, path, context)
+                }
+                Log.i(TAG, "saveDefaults: Saved image to internal storage.")
+            }
+            else{
+                // if no image is available, write a default wikipedia logo image into the file.
+                // the image is saved under assets/sampleImage.png
+                val file = File(context.filesDir, "defaultImage.png")
+                val inputStream = context.assets.open("sampleImage.png")
+                file.outputStream().use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+                Log.i(TAG, "saveDefaults: No image available, saved default image.")
             }
         }
+
         Log.i(TAG, "saveDefaults: Saved to defaults.json")
     }
 
