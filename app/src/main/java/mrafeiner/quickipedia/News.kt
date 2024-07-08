@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -138,109 +139,121 @@ fun NewsArticle(modifier: Modifier = Modifier, article: State<JSONObject>){
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(8.dp),
         colors = CardDefaults.outlinedCardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer
+            containerColor = MaterialTheme.colorScheme.background
         )
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.onSecondary,
-                            MaterialTheme.colorScheme.secondaryContainer
-                        )
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer
+            )
+        ) {
+            Row (
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        MaterialTheme.colorScheme.secondaryContainer,
                     )
-                )
-                .padding(16.dp),
-
-            ) {
-            Log.d("News", "NewsArticle: ${article.value}")
-            if(article.value.has("thumbnail")){
-                Box(
-                    modifier = Modifier
-                        .widthIn(0.dp, 150.dp)
-                        .aspectRatio(
-                            (article.value
-                                .getJSONObject("thumbnail")
-                                .getDouble("width") / article.value
-                                .getJSONObject("thumbnail")
-                                .getDouble("height")).toFloat()
-                        ),
-
-                    contentAlignment = Alignment.TopStart
-                ) {
-                    Card(
-                        shape = RoundedCornerShape(0.dp, 0.dp, 16.dp, 0.dp),
-                        modifier = Modifier.wrapContentSize()
-                    ){
-                        val painter = rememberAsyncImagePainter(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(article.value.getJSONObject("thumbnail").getString("source"))
-                                .size(Size.ORIGINAL)
-                                .build()
+                    .padding(8.dp),
+            ){
+                Log.d("News", "NewsArticle: ${article.value}")
+                if(article.value.has("thumbnail")){
+                    Box(
+                        modifier = Modifier
+                            .widthIn(0.dp, 150.dp)
+                            .aspectRatio(
+                                (article.value
+                                    .getJSONObject("thumbnail")
+                                    .getDouble("width") / article.value
+                                    .getJSONObject("thumbnail")
+                                    .getDouble("height")).toFloat()
+                            ),
+                        contentAlignment = Alignment.TopStart
+                    ) {
+                        Card(
+                            shape = RoundedCornerShape(0.dp, 0.dp, 16.dp, 0.dp),
+                            modifier = Modifier
+                                .wrapContentWidth()
+                        ){
+                            val painter = rememberAsyncImagePainter(
+                                model = ImageRequest.Builder(LocalContext.current)
+                                    .data(article.value.getJSONObject("thumbnail").getString("source"))
+                                    .size(Size.ORIGINAL)
+                                    .build()
+                            )
+                            androidx.compose.foundation.Image(
+                                painter = painter,
+                                contentDescription = "thumbnail",
+                                contentScale = ContentScale.Fit,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                            /*
+                            AsyncImage(
+                                model = content.value.getJSONObject("tfa").getJSONObject("thumbnail").getString("source"),
+                                contentDescription = "thumbnail",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )*/
+                        }
+                    }
+                }
+                Column(
+                ){
+                    if(article.value.has("titles")){
+                        Text(
+                            text = article.value.getJSONObject("titles").getString("normalized"),
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                            modifier = Modifier.padding(start = 8.dp, top = 16.dp, end = 0.dp, bottom =0.dp)
                         )
-                        androidx.compose.foundation.Image(
-                            painter = painter,
-                            contentDescription = "thumbnail",
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier.fillMaxSize()
+                    }
+                    if(article.value.has("content_urls")){
+                        Text(
+                            text = "Open in Wikipedia",
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            fontSize = MaterialTheme.typography.bodySmall.fontSize,
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .clickable {
+                                    // Open the Link from the JSON.
+                                    val url = article.value
+                                        .getJSONObject("content_urls")
+                                        .getJSONObject("desktop")
+                                        .getString("page")
+                                    val intent = Intent(Intent.ACTION_VIEW)
+                                    intent.data = Uri.parse(url)
+                                    context.startActivity(intent)
+                                }
                         )
-                        /*
-                        AsyncImage(
-                            model = content.value.getJSONObject("tfa").getJSONObject("thumbnail").getString("source"),
-                            contentDescription = "thumbnail",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )*/
                     }
                 }
             }
-            Column(
-            ){
-                if(article.value.has("titles")){
-                    Text(
-                        text = article.value.getJSONObject("titles").getString("normalized"),
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                        modifier = Modifier.padding(start = 8.dp, top = 16.dp, end = 0.dp, bottom =0.dp)
-                    )
-                }
-                if(article.value.has("content_urls")){
-                    Text(
-                        text = "Open in Wikipedia",
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                        fontSize = MaterialTheme.typography.bodySmall.fontSize,
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .clickable {
-                                // Open the Link from the JSON.
-                                val url = article.value
-                                    .getJSONObject("content_urls")
-                                    .getJSONObject("desktop")
-                                    .getString("page")
-                                val intent = Intent(Intent.ACTION_VIEW)
-                                intent.data = Uri.parse(url)
-                                context.startActivity(intent)
-                            }
-                    )
-                }
-            }
+
         }
         if(article.value.has("extract")){
-            Column(
-                // make this column scrollable
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(0.dp, 500.dp)
-                    .verticalScroll(rememberScrollState(), true)
-            ){
-                Text(
-                    text = article.value.getString("extract"),
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 16.dp)
+                    .padding(8.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
                 )
+            ) {
+                Column(
+                    // make this column scrollable
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(0.dp, 500.dp)
+                        .verticalScroll(rememberScrollState(), true)
+                ){
+                    Text(
+                        text = article.value.getString("extract"),
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 0.dp, bottom = 16.dp)
+                    )
+                }
             }
+
         }
     }
 }
