@@ -1,9 +1,7 @@
-package mrafeiner.quickipedia.ui.theme
+package mrafeiner.quickipedia
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.util.Log
-import androidx.compose.ui.platform.LocalContext
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
@@ -13,10 +11,6 @@ import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.headers
-import io.ktor.utils.io.InternalAPI
-import io.ktor.utils.io.copyTo
-import io.ktor.utils.io.streams.asOutput
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
