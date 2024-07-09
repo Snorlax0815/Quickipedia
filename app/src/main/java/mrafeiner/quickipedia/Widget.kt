@@ -4,10 +4,16 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
@@ -17,12 +23,15 @@ import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.cornerRadius
 import androidx.glance.appwidget.lazy.LazyColumn
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
+import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
@@ -75,8 +84,7 @@ class Widget : GlanceAppWidget() {
         Column(
             modifier = GlanceModifier
                 .fillMaxSize()
-                .background(GlanceTheme.colors.background)
-                .padding(16.dp)
+                .background(GlanceTheme.colors.tertiaryContainer)
                 .clickable {
                     Toast.makeText(context, "Clicked", Toast.LENGTH_SHORT).show()
                     Log.d("Widget", "Clicked")
@@ -96,47 +104,65 @@ class Widget : GlanceAppWidget() {
                     }
                 }
         ) {
-            Row {
-                if (content.value.has("thumbnail")) {
-                    val imageFile = File(context.filesDir, imagePath.value)
-                    val imageBitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
-                    val provider = ImageProvider(imageBitmap)
+            Row(
+                modifier = GlanceModifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.surfaceContainer),
+            ){
+                Row {
+                    if (content.value.has("thumbnail")) {
+                        val imageFile = File(context.filesDir, imagePath.value)
+                        val imageBitmap = BitmapFactory.decodeFile(imageFile.absolutePath)
+                        val provider = ImageProvider(imageBitmap)
 
-                    androidx.glance.Image(
-                        provider = provider,
-                        contentDescription = "Image",
-                        modifier = GlanceModifier
-                            .width(200.dp)
-                    )
-                }
-                if(content.value.has("titles")){
-                    Text(
-                        text = content.value.getJSONObject("titles").getString("normalized"),
-                        modifier = GlanceModifier
-                            .padding(start = 8.dp, top = 8.dp),
-                        style = TextStyle(
-                            color = GlanceTheme.colors.onBackground,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp
+                        androidx.glance.Image(
+                            provider = provider,
+                            contentDescription = "Image",
+                            modifier = GlanceModifier
+                                .width(200.dp)
+                                .padding(start = 8.dp)
                         )
-                    )
-                }
-            }
-
-            if (content.value.has("extract")){
-                LazyColumn(
-
-                ){
-                    item {
+                    }
+                    if(content.value.has("titles")){
                         Text(
-                            text = content.value.getString("extract"),
-                            modifier = GlanceModifier.padding(top = 8.dp),
+                            text = content.value.getJSONObject("titles").getString("normalized"),
+                            modifier = GlanceModifier
+                                .padding(start = 8.dp, top = 8.dp),
                             style = TextStyle(
-                                color = GlanceTheme.colors.onBackground
+                                color = GlanceTheme.colors.background,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp
                             )
                         )
                     }
                 }
+            }
+
+
+            if (content.value.has("extract")){
+                Row(
+                    modifier = GlanceModifier
+                        .fillMaxSize()
+                        .padding(8.dp)
+                ){
+                    LazyColumn(
+                        modifier = GlanceModifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+                            .cornerRadius(4.dp),
+                    ){
+                        item {
+                            Text(
+                                text = content.value.getString("extract"),
+                                modifier = GlanceModifier.padding(16.dp),
+                                style = TextStyle(
+                                    color = GlanceTheme.colors.background
+                                )
+                            )
+                        }
+                    }
+                }
+
             }
 
         }
