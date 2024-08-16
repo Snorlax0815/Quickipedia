@@ -1,7 +1,9 @@
 package mrafeiner.quickipedia
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -84,13 +86,13 @@ class Widget : GlanceAppWidget() {
         Column(
             modifier = GlanceModifier
                 .fillMaxSize()
-                .background(GlanceTheme.colors.tertiaryContainer)
+                .background(GlanceTheme.colors.background)
                 .clickable {
                     Toast.makeText(context, "Clicked", Toast.LENGTH_SHORT).show()
                     Log.d("Widget", "Clicked")
                     // Handle click
                     CoroutineScope(Dispatchers.IO).launch {
-                        content.value = utils.sendRequest(context = context)
+                        content.value = utils.loadDefaults(context)//utils.sendRequest(context = context)
                         val sh = context.getSharedPreferences("lastUpdate", Context.MODE_PRIVATE).edit()
                         sh.putLong("lastUpdate", System.currentTimeMillis())
                         // only
@@ -107,7 +109,7 @@ class Widget : GlanceAppWidget() {
             Row(
                 modifier = GlanceModifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surfaceContainer),
+                    .background(GlanceTheme.colors.secondaryContainer),
             ){
                 Row {
                     if (content.value.has("thumbnail")) {
@@ -123,18 +125,44 @@ class Widget : GlanceAppWidget() {
                                 .padding(start = 8.dp)
                         )
                     }
-                    if(content.value.has("titles")){
-                        Text(
-                            text = content.value.getJSONObject("titles").getString("normalized"),
-                            modifier = GlanceModifier
-                                .padding(start = 8.dp, top = 8.dp),
-                            style = TextStyle(
-                                color = GlanceTheme.colors.background,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 20.sp
+                    Column (
+
+                    ){
+                        if(content.value.has("titles")){
+                            Text(
+                                text = content.value.getJSONObject("titles").getString("normalized"),
+                                modifier = GlanceModifier
+                                    .padding(start = 8.dp, top = 8.dp),
+                                style = TextStyle(
+                                    color = GlanceTheme.colors.onSecondaryContainer,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 20.sp
+                                )
                             )
-                        )
+                        }
+                        if(content.value.has("content_urls")){
+                            val url = content.value.getJSONObject("content_urls").getJSONObject("desktop").getString("page")
+                            Text(
+                                text = "Open in Wikipedia",
+                                modifier = GlanceModifier
+                                    .padding(start = 8.dp, top = 8.dp)
+                                    .clickable {
+                                        val intent = Intent(Intent.ACTION_VIEW)
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                        intent.data = Uri.parse(url)
+                                        context.startActivity(intent)
+                                    },
+                                style = TextStyle(
+                                    color = GlanceTheme.colors.onSecondaryContainer,
+                                    fontSize = 12.sp
+                                ),
+
+                                )
+
+                        }
+
                     }
+
                 }
             }
 
@@ -144,11 +172,12 @@ class Widget : GlanceAppWidget() {
                     modifier = GlanceModifier
                         .fillMaxSize()
                         .padding(8.dp)
+                        .background(GlanceTheme.colors.secondaryContainer)
                 ){
                     LazyColumn(
                         modifier = GlanceModifier
                             .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+                            .background(GlanceTheme.colors.onSecondaryContainer)
                             .cornerRadius(4.dp),
                     ){
                         item {
@@ -156,7 +185,7 @@ class Widget : GlanceAppWidget() {
                                 text = content.value.getString("extract"),
                                 modifier = GlanceModifier.padding(16.dp),
                                 style = TextStyle(
-                                    color = GlanceTheme.colors.background
+                                    color = GlanceTheme.colors.inversePrimary,
                                 )
                             )
                         }

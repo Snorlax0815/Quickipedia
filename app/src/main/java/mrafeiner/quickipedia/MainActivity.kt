@@ -18,6 +18,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -58,6 +59,11 @@ class MainActivity : ComponentActivity() {
         val context = LocalContext.current
         val content = remember { mutableStateOf(utils.loadDefaults(context))}
         val displayContent = remember { mutableStateOf(true) }
+        val displayDate = remember {
+            mutableStateOf(context.getSharedPreferences("lastUpdate", Context.MODE_PRIVATE).getLong("lastUpdate", System.currentTimeMillis()))
+        }
+
+
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             topBar = {
@@ -104,10 +110,9 @@ class MainActivity : ComponentActivity() {
                     ) {
                         Text(text ="Refresh")
                     }
-                    if(context.getSharedPreferences("lastUpdate", Context.MODE_PRIVATE).contains("lastUpdate")){
-                        val d = Date(context.getSharedPreferences("lastUpdate", MODE_PRIVATE).getLong("lastUpdate", 0))
+                    if(context.getSharedPreferences("lastUpdate", MODE_PRIVATE).contains("lastUpdate")){
                         val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-                        val formattedDate = formatter.format(d)
+                        val formattedDate = formatter.format(displayDate.value)
                         Text(
                             text = "Last Update: $formattedDate", // Use formattedDate here
                             modifier = Modifier.padding(top = 0.dp)
