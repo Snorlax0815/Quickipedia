@@ -34,6 +34,7 @@ import androidx.glance.layout.Column
 import androidx.glance.layout.Row
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
+import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
@@ -123,6 +124,7 @@ class Widget : GlanceAppWidget() {
                             modifier = GlanceModifier
                                 .width(200.dp)
                                 .padding(start = 8.dp)
+                                .height(150.dp)
                         )
                     }
                     Column (

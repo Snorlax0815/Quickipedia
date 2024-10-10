@@ -48,17 +48,17 @@ fun Image(modifier: Modifier = Modifier, c: State<JSONObject> = mutableStateOf(u
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            /*Box(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
                 contentAlignment = Alignment.Center
             ){
                 Text(
-                    text = "Quickipedia",
+                    text = "Image of the Day",
                     fontSize = MaterialTheme.typography.titleLarge.fontSize
                 )
-            }*/
+            }
         },
         bottomBar = {
             /*Box(

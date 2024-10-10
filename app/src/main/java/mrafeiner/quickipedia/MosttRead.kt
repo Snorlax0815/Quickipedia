@@ -3,6 +3,7 @@ package mrafeiner.quickipedia
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
@@ -41,10 +43,10 @@ import coil.size.Size
 import org.json.JSONArray
 import org.json.JSONObject
 
-private val utils = Utils()
+private val utils: Utils = Utils()
 
 @Composable
-fun News(modifier: Modifier = Modifier, c: State<JSONObject> = mutableStateOf(utils.loadDefaults(LocalContext.current))) {
+fun MostRead(modifier: Modifier = Modifier, c: State<JSONObject> = mutableStateOf(utils.loadDefaults(LocalContext.current))) {
     val content = c
     val displayContent = remember { mutableStateOf(true) }
     val context = LocalContext.current
@@ -59,39 +61,17 @@ fun News(modifier: Modifier = Modifier, c: State<JSONObject> = mutableStateOf(ut
                 contentAlignment = Alignment.Center
             ){
                 Text(
-                    text = "News",
+                    text = "Most read articles",
                     fontSize = MaterialTheme.typography.titleLarge.fontSize
                 )
             }
         },
         bottomBar = {
-            /*Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
-            ){
-                Button(
-                    onClick = {
-                        // launch Coroutine with dispatchers IO
-                        CoroutineScope(Dispatchers.IO).launch {
-                            content.value = utils.sendRequest("GET")
-                            displayContent.value = true
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth(0.75f)
-                        .padding(16.dp),
-
-                    ) {
-                    Text(text ="Send Request")
-                }
-            }*/
         }
     ){
         Box(modifier = Modifier.padding(it)){
             // create list of JSONObjects from content, then create NewsArticle for each
-            if(displayContent.value && (content.value.has("news"))){
+            if(displayContent.value && (content.value.has("mostread"))){
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -99,12 +79,19 @@ fun News(modifier: Modifier = Modifier, c: State<JSONObject> = mutableStateOf(ut
                         .heightIn(0.dp, 1000.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ){
-                    val currentNews: JSONArray = content.value.getJSONArray("news").getJSONObject(0).getJSONArray("links")
+                    var currentMostRead: JSONArray = content.value.getJSONObject("mostread").getJSONArray("articles")
+                    // limit to top 5 articles
+                    if (currentMostRead.length() > 5) {
+                        val limitedArray = JSONArray()
+                        for (i in 0 until 5) {
+                            limitedArray.put(currentMostRead.get(i))
+                        }
+                        currentMostRead = limitedArray
+                    }
                     LazyColumn(
-
                     ){
-                        items(currentNews.length()){ index ->
-                            NewsArticle(article = mutableStateOf(currentNews.getJSONObject(index)), modifier = Modifier.padding(top = 8.dp, bottom = 8.dp))
+                        items(currentMostRead.length()){ index ->
+                            MostReadEntry(article = mutableStateOf(currentMostRead.getJSONObject(index)), modifier = Modifier.padding(top = 8.dp, bottom = 8.dp))
                         }
                     }
                 }
@@ -125,7 +112,7 @@ fun News(modifier: Modifier = Modifier, c: State<JSONObject> = mutableStateOf(ut
 
 
 @Composable
-fun NewsArticle(modifier: Modifier = Modifier, article: State<JSONObject>){
+fun MostReadEntry(modifier: Modifier = Modifier, article: State<JSONObject>){
     val context = LocalContext.current
     OutlinedCard(
         modifier = modifier
@@ -253,10 +240,8 @@ fun NewsArticle(modifier: Modifier = Modifier, article: State<JSONObject>){
     }
 }
 
-
-
 @Composable
 @Preview
-fun Preview(){
-    News()
+fun MostReadPreview() {
+    MostRead()
 }
